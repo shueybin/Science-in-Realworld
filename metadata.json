@@ -1,0 +1,8 @@
+{
+  "name": "Science in Realworld – Periodic Table (B2B Edition)",
+  "description": "Interactive real-world periodic table and chemistry learning platform with B2B group licensing for schools, universities, and corporate labs. Installable as an Android app for Google Play Store.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

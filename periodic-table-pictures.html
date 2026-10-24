@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elements, In Pictures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1F5F2;
+    --paper-raised:#FFFFFF;
+    --ink:#16232E;
+    --ink-soft:#5A6B72;
+    --line:#D8E0DA;
+    --am:#E8590C; --ae:#F08C00; --tm:#1971C2; --pm:#0CA678; --md:#7048E8;
+    --nm:#5C940D; --hg:#E8590C; --ng:#AE3EC9; --ln:#E64980; --ac:#5F3DC4;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Lexend',sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1400px;margin:0 auto;padding:20px 16px 60px;}
+
+  header{margin-bottom:18px;}
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,5vw,44px);
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 18px;max-width:560px;line-height:1.5;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;}
+  .search{
+    flex:1 1 220px;
+    padding:10px 14px;
+    border-radius:10px;
+    border:1.5px solid var(--line);
+    background:var(--paper-raised);
+    font-family:'Lexend',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .search:focus{outline:none;border-color:var(--ink);}
+
+  .tabs{display:flex;gap:6px;background:var(--paper-raised);border:1.5px solid var(--line);border-radius:10px;padding:4px;}
+  .tab-btn{
+    border:none;background:transparent;padding:8px 16px;border-radius:7px;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;
+    color:var(--ink-soft);cursor:pointer;
+  }
+  .tab-btn.active{background:var(--ink);color:var(--paper-raised);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+  .chip{
+    display:flex;align-items:center;gap:6px;
+    border:1.5px solid var(--line);background:var(--paper-raised);
+    border-radius:999px;padding:5px 11px 5px 7px;cursor:pointer;
+    font-size:12px;color:var(--ink-soft);
+    transition:opacity .15s ease;
+  }
+  .chip .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .chip.dim{opacity:.35;}
+  .chip.active{border-color:var(--ink);color:var(--ink);}
+
+  /* ---- TABLE VIEW ---- */
+  #tableView{overflow-x:auto;padding-bottom:14px;-webkit-overflow-scrolling:touch;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(18,minmax(52px,1fr));
+    grid-auto-rows:minmax(52px,1fr);
+    gap:4px;
+    min-width:1080px;
+  }
+  .cell{
+    position:relative;
+    background:var(--paper-raised);
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:4px 5px;
+    cursor:pointer;
+    display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .15s ease;
+    overflow:hidden;
+  }
+  .cell:hover, .cell:focus-visible{transform:translateY(-2px);box-shadow:0 4px 10px rgba(22,35,46,.12);outline:none;}
+  .cell.dim{opacity:.22;}
+  .cell.match{box-shadow:0 0 0 2px var(--ink);}
+  .cell .num{font-size:9px;color:var(--ink-soft);font-family:'Space Grotesk',sans-serif;}
+  .cell .icon{font-size:16px;line-height:1;text-align:right;}
+  .cell .sym{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
+  .placeholder{
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:1.5px dashed var(--line);border-radius:8px;
+    font-size:10px;color:var(--ink-soft);text-align:center;padding:2px;
+  }
+
+  /* ---- BROWSE (ONE BY ONE) VIEW ---- */
+  #browseView{display:none;}
+  .browse-card{
+    background:var(--paper-raised);
+    border:1.5px solid var(--line);
+    border-radius:18px;
+    max-width:460px;
+    margin:0 auto;
+    padding:34px 28px 28px;
+    text-align:center;
+  }
+  .browse-icon-badge{
+    width:84px;height:84px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:40px;margin:0 auto 16px;
+  }
+  .browse-num{font-family:'Space Grotesk',sans-serif;color:var(--ink-soft);font-size:13px;}
+  .browse-sym{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:56px;line-height:1.1;margin:2px 0;}
+  .browse-name{font-size:19px;font-weight:500;margin:0 0 6px;}
+  .browse-cat{display:inline-block;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin-bottom:16px;}
+  .browse-use{font-size:15px;line-height:1.55;color:var(--ink);margin:0;}
+
+  .browse-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px;}
+  .nav-btn{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
+    border:1.5px solid var(--ink);background:var(--ink);color:var(--paper-raised);
+    border-radius:999px;padding:10px 20px;cursor:pointer;
+  }
+  .nav-btn.ghost{background:transparent;color:var(--ink);}
+  .nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+  .progress-wrap{max-width:460px;margin:18px auto 0;}
+  input[type=range]{width:100%;accent-color:var(--ink);}
+  .progress-label{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+  /* ---- DETAIL SHEET (table view tap) ---- */
+  .sheet-backdrop{
+    display:none;position:fixed;inset:0;background:rgba(22,35,46,.4);
+    z-index:40;align-items:flex-end;justify-content:center;
+  }
+  .sheet-backdrop.open{display:flex;}
+  .sheet{
+    background:var(--paper-raised);
+    width:100%;max-width:480px;
+    border-radius:20px 20px 0 0;
+    padding:26px 24px 30px;
+    text-align:center;
+    animation:slideUp .18s ease;
+  }
+  @media(min-width:600px){
+    .sheet-backdrop{align-items:center;}
+    .sheet{border-radius:20px;}
+  }
+  @keyframes slideUp{from{transform:translateY(24px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .sheet-close{
+    float:right;border:none;background:var(--paper);color:var(--ink-soft);
+    width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;
+  }
+
+  footer{margin-top:40px;font-size:12px;color:var(--ink-soft);line-height:1.6;max-width:640px;}
+  footer a{color:var(--ink-soft);}
+
+  @media(max-width:480px){
+    .browse-sym{font-size:44px;}
+    .browse-icon-badge{width:70px;height:70px;font-size:32px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Elements, In Pictures</h1>
+    <p class="sub">Every element in the periodic table, paired with one everyday thing it's used for. Tap any tile — or step through them one by one.</p>
+  </header>
+
+  <div class="controls">
+    <input class="search" id="search" type="text" placeholder="Search by name, symbol, or number…">
+    <div class="tabs">
+      <button class="tab-btn active" data-view="table">Table</button>
+      <button class="tab-btn" data-view="browse">Browse one by one</button>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="tableView">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="browseView">
+    <div class="browse-card" id="browseCard"></div>
+    <div class="browse-nav">
+      <button class="nav-btn ghost" id="prevBtn">← Prev</button>
+      <button class="nav-btn" id="nextBtn">Next →</button>
+    </div>
+    <div class="progress-wrap">
+      <input type="range" id="progressSlider" min="0" max="117" value="0">
+      <div class="progress-label" id="progressLabel">1 / 118</div>
+    </div>
+  </div>
+
+  <footer>
+    Icons are original picks chosen to represent each element's best-known real-world use, in the spirit of Keith Enevoldsen's "Periodic Table of the Elements, in Pictures and Words." Built as a standalone page — no external image libraries required.
+  </footer>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop">
+  <div class="sheet" id="sheetContent"></div>
+</div>
+
+<script>
+const CATS = {"am":{"label":"Alkali metal","color":"#E8590C"},"ae":{"label":"Alkaline earth metal","color":"#F08C00"},"tm":{"label":"Transition metal","color":"#1971C2"},"pm":{"label":"Post-transition metal","color":"#0CA678"},"md":{"label":"Metalloid","color":"#7048E8"},"nm":{"label":"Reactive nonmetal","color":"#5C940D"},"hg":{"label":"Halogen","color":"#F08C00"},"ng":{"label":"Noble gas","color":"#AE3EC9"},"ln":{"label":"Lanthanide","color":"#E64980"},"ac":{"label":"Actinide","color":"#5F3DC4"}};
+const ELEMENTS = [{"z":1,"s":"H","n":"Hydrogen","cat":"nm","r":1,"c":1,"i":"⭐","u":"Powers the Sun and stars through nuclear fusion"},{"z":2,"s":"He","n":"Helium","cat":"ng","r":1,"c":18,"i":"🎈","u":"Fills balloons and airships; cools MRI magnets"},{"z":3,"s":"Li","n":"Lithium","cat":"am","r":2,"c":1,"i":"🔋","u":"Rechargeable batteries in phones and EVs"},{"z":4,"s":"Be","n":"Beryllium","cat":"ae","r":2,"c":2,"i":"💎","u":"Emerald gemstones and lightweight aerospace parts"},{"z":5,"s":"B","n":"Boron","cat":"md","r":2,"c":13,"i":"🏒","u":"Strengthens glass and sports equipment"},{"z":6,"s":"C","n":"Carbon","cat":"nm","r":2,"c":14,"i":"🧬","u":"The backbone of every living thing"},{"z":7,"s":"N","n":"Nitrogen","cat":"nm","r":2,"c":15,"i":"💨","u":"Makes up 78% of the air we breathe"},{"z":8,"s":"O","n":"Oxygen","cat":"nm","r":2,"c":16,"i":"🫁","u":"Essential for breathing and burning fuel"},{"z":9,"s":"F","n":"Fluorine","cat":"hg","r":2,"c":17,"i":"🦷","u":"Toothpaste and non-stick cookware coatings"},{"z":10,"s":"Ne","n":"Neon","cat":"ng","r":2,"c":18,"i":"💡","u":"Glowing neon advertising signs"},{"z":11,"s":"Na","n":"Sodium","cat":"am","r":3,"c":1,"i":"🧂","u":"Table salt, as sodium chloride"},{"z":12,"s":"Mg","n":"Magnesium","cat":"ae","r":3,"c":2,"i":"🌿","u":"Chlorophyll in plants and lightweight metal alloys"},{"z":13,"s":"Al","n":"Aluminum","cat":"pm","r":3,"c":13,"i":"✈️","u":"Lightweight airplane bodies and drink cans"},{"z":14,"s":"Si","n":"Silicon","cat":"md","r":3,"c":14,"i":"💻","u":"Computer chips and solar panels"},{"z":15,"s":"P","n":"Phosphorus","cat":"nm","r":3,"c":15,"i":"🦴","u":"Bones, teeth, and crop fertilizers"},{"z":16,"s":"S","n":"Sulfur","cat":"nm","r":3,"c":16,"i":"🥚","u":"Gives eggs their smell; used in gunpowder and rubber"},{"z":17,"s":"Cl","n":"Chlorine","cat":"hg","r":3,"c":17,"i":"🏊","u":"Disinfects swimming pools and drinking water"},{"z":18,"s":"Ar","n":"Argon","cat":"ng","r":3,"c":18,"i":"💡","u":"Fills incandescent light bulbs"},{"z":19,"s":"K","n":"Potassium","cat":"am","r":4,"c":1,"i":"🍌","u":"Found in bananas; essential for nerves and muscles"},{"z":20,"s":"Ca","n":"Calcium","cat":"ae","r":4,"c":2,"i":"🦴","u":"Builds strong bones and teeth"},{"z":21,"s":"Sc","n":"Scandium","cat":"tm","r":4,"c":3,"i":"🚲","u":"Lightweight bicycle frames and aerospace alloys"},{"z":22,"s":"Ti","n":"Titanium","cat":"tm","r":4,"c":4,"i":"🦿","u":"Strong, light medical implants and aircraft parts"},{"z":23,"s":"V","n":"Vanadium","cat":"tm","r":4,"c":5,"i":"🔧","u":"Hardens steel for tools and springs"},{"z":24,"s":"Cr","n":"Chromium","cat":"tm","r":4,"c":6,"i":"🪞","u":"Shiny chrome plating and stainless steel"},{"z":25,"s":"Mn","n":"Manganese","cat":"tm","r":4,"c":7,"i":"🏗️","u":"Strengthens steel for construction"},{"z":26,"s":"Fe","n":"Iron","cat":"tm","r":4,"c":8,"i":"🧲","u":"Steel, magnets, and hemoglobin in blood"},{"z":27,"s":"Co","n":"Cobalt","cat":"tm","r":4,"c":9,"i":"🎨","u":"Vivid blue pigments and battery cathodes"},{"z":28,"s":"Ni","n":"Nickel","cat":"tm","r":4,"c":10,"i":"🪙","u":"Coins and stainless steel"},{"z":29,"s":"Cu","n":"Copper","cat":"tm","r":4,"c":11,"i":"⚡","u":"Electrical wiring in nearly every building"},{"z":30,"s":"Zn","n":"Zinc","cat":"tm","r":4,"c":12,"i":"🛡️","u":"Galvanized coatings that stop rust"},{"z":31,"s":"Ga","n":"Gallium","cat":"pm","r":4,"c":13,"i":"📱","u":"LEDs and smartphone semiconductors"},{"z":32,"s":"Ge","n":"Germanium","cat":"md","r":4,"c":14,"i":"🔭","u":"Fiber-optic cables and infrared lenses"},{"z":33,"s":"As","n":"Arsenic","cat":"md","r":4,"c":15,"i":"🪵","u":"Wood preservatives and semiconductor doping"},{"z":34,"s":"Se","n":"Selenium","cat":"nm","r":4,"c":16,"i":"☀️","u":"Solar cells and photocopier drums"},{"z":35,"s":"Br","n":"Bromine","cat":"hg","r":4,"c":17,"i":"🔥","u":"Flame retardants in fabrics and electronics"},{"z":36,"s":"Kr","n":"Krypton","cat":"ng","r":4,"c":18,"i":"📸","u":"High-performance camera flash lamps"},{"z":37,"s":"Rb","n":"Rubidium","cat":"am","r":5,"c":1,"i":"⏱️","u":"Precision atomic clocks"},{"z":38,"s":"Sr","n":"Strontium","cat":"ae","r":5,"c":2,"i":"🎆","u":"Brilliant red fireworks and flares"},{"z":39,"s":"Y","n":"Yttrium","cat":"tm","r":5,"c":3,"i":"📺","u":"Red phosphors in TV and LED screens"},{"z":40,"s":"Zr","n":"Zirconium","cat":"tm","r":5,"c":4,"i":"💍","u":"Cubic zirconia gems and reactor cladding"},{"z":41,"s":"Nb","n":"Niobium","cat":"tm","r":5,"c":5,"i":"🧲","u":"Superconducting magnets in MRI machines"},{"z":42,"s":"Mo","n":"Molybdenum","cat":"tm","r":5,"c":6,"i":"⚙️","u":"Hardens steel for high-stress tools"},{"z":43,"s":"Tc","n":"Technetium","cat":"tm","r":5,"c":7,"i":"☢️","u":"Radioactive tracer for medical imaging"},{"z":44,"s":"Ru","n":"Ruthenium","cat":"tm","r":5,"c":8,"i":"🖊️","u":"Durable electrical contacts and pen tips"},{"z":45,"s":"Rh","n":"Rhodium","cat":"tm","r":5,"c":9,"i":"🚗","u":"Catalytic converters that clean car exhaust"},{"z":46,"s":"Pd","n":"Palladium","cat":"tm","r":5,"c":10,"i":"🚗","u":"Catalytic converters and electronics"},{"z":47,"s":"Ag","n":"Silver","cat":"tm","r":5,"c":11,"i":"🪞","u":"Jewelry, mirrors, and electrical contacts"},{"z":48,"s":"Cd","n":"Cadmium","cat":"tm","r":5,"c":12,"i":"🔋","u":"Rechargeable nickel-cadmium batteries"},{"z":49,"s":"In","n":"Indium","cat":"pm","r":5,"c":13,"i":"📱","u":"Touchscreens, as transparent indium tin oxide"},{"z":50,"s":"Sn","n":"Tin","cat":"pm","r":5,"c":14,"i":"🥫","u":"Tin cans and solder joints"},{"z":51,"s":"Sb","n":"Antimony","cat":"md","r":5,"c":15,"i":"🔥","u":"Flame retardants and lead-acid batteries"},{"z":52,"s":"Te","n":"Tellurium","cat":"md","r":5,"c":16,"i":"☀️","u":"Thin-film solar panels and alloys"},{"z":53,"s":"I","n":"Iodine","cat":"hg","r":5,"c":17,"i":"🦋","u":"Essential for thyroid health; wound antiseptic"},{"z":54,"s":"Xe","n":"Xenon","cat":"ng","r":5,"c":18,"i":"🚘","u":"Bright xenon car headlights"},{"z":55,"s":"Cs","n":"Cesium","cat":"am","r":6,"c":1,"i":"⏰","u":"Defines the exact length of a second"},{"z":56,"s":"Ba","n":"Barium","cat":"ae","r":6,"c":2,"i":"🏥","u":"Contrast fluid for medical X-rays"},{"z":72,"s":"Hf","n":"Hafnium","cat":"tm","r":6,"c":4,"i":"⚛️","u":"Control rods that regulate nuclear reactors"},{"z":73,"s":"Ta","n":"Tantalum","cat":"tm","r":6,"c":5,"i":"📱","u":"Tiny capacitors inside smartphones"},{"z":74,"s":"W","n":"Tungsten","cat":"tm","r":6,"c":6,"i":"💡","u":"Light bulb filaments and drill bits"},{"z":75,"s":"Re","n":"Rhenium","cat":"tm","r":6,"c":7,"i":"✈️","u":"High-temperature jet engine parts"},{"z":76,"s":"Os","n":"Osmium","cat":"tm","r":6,"c":8,"i":"⚖️","u":"Extremely hard, dense instrument pivots"},{"z":77,"s":"Ir","n":"Iridium","cat":"tm","r":6,"c":9,"i":"📏","u":"Once defined the standard kilogram; hardens alloys"},{"z":78,"s":"Pt","n":"Platinum","cat":"tm","r":6,"c":10,"i":"💍","u":"Fine jewelry and catalytic converters"},{"z":79,"s":"Au","n":"Gold","cat":"tm","r":6,"c":11,"i":"👑","u":"Jewelry and corrosion-proof electronics"},{"z":80,"s":"Hg","n":"Mercury","cat":"tm","r":6,"c":12,"i":"🌡️","u":"Older thermometers and fluorescent lamps"},{"z":81,"s":"Tl","n":"Thallium","cat":"pm","r":6,"c":13,"i":"☠️","u":"Historically rat poison; now in electronics"},{"z":82,"s":"Pb","n":"Lead","cat":"pm","r":6,"c":14,"i":"🔋","u":"Car batteries and radiation shielding"},{"z":83,"s":"Bi","n":"Bismuth","cat":"pm","r":6,"c":15,"i":"💊","u":"Stomach-settling medicine and cosmetics"},{"z":84,"s":"Po","n":"Polonium","cat":"pm","r":6,"c":16,"i":"☢️","u":"Radioactive; used in anti-static brushes"},{"z":85,"s":"At","n":"Astatine","cat":"hg","r":6,"c":17,"i":"🔬","u":"Among the rarest elements; studied in research only"},{"z":86,"s":"Rn","n":"Radon","cat":"ng","r":6,"c":18,"i":"⚠️","u":"Radioactive gas tested for in homes"},{"z":87,"s":"Fr","n":"Francium","cat":"am","r":7,"c":1,"i":"🔬","u":"So rare it exists only briefly in labs"},{"z":88,"s":"Ra","n":"Radium","cat":"ae","r":7,"c":2,"i":"☢️","u":"Once used in glow-in-the-dark paint"},{"z":104,"s":"Rf","n":"Rutherfordium","cat":"tm","r":7,"c":4,"i":"🧪","u":"Synthetic element made in particle accelerators"},{"z":105,"s":"Db","n":"Dubnium","cat":"tm","r":7,"c":5,"i":"🧪","u":"Synthetic element studied only in research labs"},{"z":106,"s":"Sg","n":"Seaborgium","cat":"tm","r":7,"c":6,"i":"🧪","u":"Synthetic element, exists for moments"},{"z":107,"s":"Bh","n":"Bohrium","cat":"tm","r":7,"c":7,"i":"🧪","u":"Synthetic element, produced atom by atom"},{"z":108,"s":"Hs","n":"Hassium","cat":"tm","r":7,"c":8,"i":"🧪","u":"Synthetic element made by fusing nuclei"},{"z":109,"s":"Mt","n":"Meitnerium","cat":"tm","r":7,"c":9,"i":"🧪","u":"Synthetic element named for Lise Meitner"},{"z":110,"s":"Ds","n":"Darmstadtium","cat":"tm","r":7,"c":10,"i":"🧪","u":"Synthetic element made in Germany's GSI lab"},{"z":111,"s":"Rg","n":"Roentgenium","cat":"tm","r":7,"c":11,"i":"🧪","u":"Synthetic element named for Wilhelm Roentgen"},{"z":112,"s":"Cn","n":"Copernicium","cat":"tm","r":7,"c":12,"i":"🧪","u":"Synthetic element named for Copernicus"},{"z":113,"s":"Nh","n":"Nihonium","cat":"pm","r":7,"c":13,"i":"🧪","u":"Synthetic element first made in Japan"},{"z":114,"s":"Fl","n":"Flerovium","cat":"pm","r":7,"c":14,"i":"🧪","u":"Synthetic superheavy element"},{"z":115,"s":"Mc","n":"Moscovium","cat":"pm","r":7,"c":15,"i":"🧪","u":"Synthetic element first made near Moscow"},{"z":116,"s":"Lv","n":"Livermorium","cat":"pm","r":7,"c":16,"i":"🧪","u":"Synthetic element named for Livermore Lab"},{"z":117,"s":"Ts","n":"Tennessine","cat":"hg","r":7,"c":17,"i":"🧪","u":"Synthetic element first made in Tennessee"},{"z":118,"s":"Og","n":"Oganesson","cat":"ng","r":7,"c":18,"i":"🧪","u":"Heaviest known synthetic element"},{"z":57,"s":"La","n":"Lanthanum","cat":"ln","r":9,"c":3,"i":"📷","u":"High-quality camera and telescope lenses"},{"z":58,"s":"Ce","n":"Cerium","cat":"ln","r":9,"c":4,"i":"🔥","u":"Lighter flints and glass polishing powder"},{"z":59,"s":"Pr","n":"Praseodymium","cat":"ln","r":9,"c":5,"i":"🥽","u":"Strong magnets and welding-goggle glass"},{"z":60,"s":"Nd","n":"Neodymium","cat":"ln","r":9,"c":6,"i":"🧲","u":"Powerful magnets in headphones and motors"},{"z":61,"s":"Pm","n":"Promethium","cat":"ln","r":9,"c":7,"i":"🔋","u":"Radioactive; powers small nuclear batteries"},{"z":62,"s":"Sm","n":"Samarium","cat":"ln","r":9,"c":8,"i":"🧲","u":"Heat-resistant magnets for motors"},{"z":63,"s":"Eu","n":"Europium","cat":"ln","r":9,"c":9,"i":"💶","u":"Red phosphors and anti-counterfeit banknote ink"},{"z":64,"s":"Gd","n":"Gadolinium","cat":"ln","r":9,"c":10,"i":"🏥","u":"Contrast agent that sharpens MRI scans"},{"z":65,"s":"Tb","n":"Terbium","cat":"ln","r":9,"c":11,"i":"💡","u":"Green phosphors in energy-efficient lighting"},{"z":66,"s":"Dy","n":"Dysprosium","cat":"ln","r":9,"c":12,"i":"🧲","u":"Magnets inside electric vehicle motors"},{"z":67,"s":"Ho","n":"Holmium","cat":"ln","r":9,"c":13,"i":"🔬","u":"Powerful lasers used in surgery"},{"z":68,"s":"Er","n":"Erbium","cat":"ln","r":9,"c":14,"i":"🌐","u":"Amplifies signals in fiber-optic internet cables"},{"z":69,"s":"Tm","n":"Thulium","cat":"ln","r":9,"c":15,"i":"☢️","u":"Portable X-ray devices"},{"z":70,"s":"Yb","n":"Ytterbium","cat":"ln","r":9,"c":16,"i":"🔬","u":"Lasers and next-generation atomic clocks"},{"z":71,"s":"Lu","n":"Lutetium","cat":"ln","r":9,"c":17,"i":"🏥","u":"Detector crystals in medical PET scans"},{"z":89,"s":"Ac","n":"Actinium","cat":"ac","r":10,"c":3,"i":"☢️","u":"Extremely rare and radioactive; research only"},{"z":90,"s":"Th","n":"Thorium","cat":"ac","r":10,"c":4,"i":"🏮","u":"Historic gas-lantern mantles; explored as reactor fuel"},{"z":91,"s":"Pa","n":"Protactinium","cat":"ac","r":10,"c":5,"i":"🔬","u":"Rare; traced in uranium ore research"},{"z":92,"s":"U","n":"Uranium","cat":"ac","r":10,"c":6,"i":"⚛️","u":"Fuel for nuclear power plants"},{"z":93,"s":"Np","n":"Neptunium","cat":"ac","r":10,"c":7,"i":"🔬","u":"Produced in reactors; used in research"},{"z":94,"s":"Pu","n":"Plutonium","cat":"ac","r":10,"c":8,"i":"🛰️","u":"Powers batteries on deep-space probes"},{"z":95,"s":"Am","n":"Americium","cat":"ac","r":10,"c":9,"i":"🔥","u":"The radioactive source inside smoke detectors"},{"z":96,"s":"Cm","n":"Curium","cat":"ac","r":10,"c":10,"i":"🚀","u":"Powers science instruments on Mars rovers"},{"z":97,"s":"Bk","n":"Berkelium","cat":"ac","r":10,"c":11,"i":"🔬","u":"Made only for scientific research"},{"z":98,"s":"Cf","n":"Californium","cat":"ac","r":10,"c":12,"i":"🔬","u":"Neutron source for starting nuclear reactors"},{"z":99,"s":"Es","n":"Einsteinium","cat":"ac","r":10,"c":13,"i":"🔬","u":"Named for Einstein; made one atom at a time"},{"z":100,"s":"Fm","n":"Fermium","cat":"ac","r":10,"c":14,"i":"🔬","u":"Discovered in early hydrogen-bomb debris"},{"z":101,"s":"Md","n":"Mendelevium","cat":"ac","r":10,"c":15,"i":"🔬","u":"Named for Mendeleev, creator of the periodic table"},{"z":102,"s":"No","n":"Nobelium","cat":"ac","r":10,"c":16,"i":"🔬","u":"Extremely radioactive; exists only in labs"},{"z":103,"s":"Lr","n":"Lawrencium","cat":"ac","r":10,"c":17,"i":"🔬","u":"The final actinide; made only in accelerators"}];
+
+const byZ = {};
+ELEMENTS.forEach(e => byZ[e.z] = e);
+const order = ELEMENTS.slice().sort((a,b)=>a.z-b.z);
+
+let activeCat = null;
+let browseIndex = 0;
+
+// ---- Legend ----
+const legendEl = document.getElementById('legend');
+Object.keys(CATS).forEach(code => {
+  const chip = document.createElement('button');
+  chip.className = 'chip';
+  chip.innerHTML = `<span class="dot" style="background:${CATS[code].color}"></span>${CATS[code].label}`;
+  chip.addEventListener('click', () => {
+    activeCat = activeCat === code ? null : code;
+    renderLegend();
+    renderGrid();
+  });
+  chip.dataset.code = code;
+  legendEl.appendChild(chip);
+});
+function renderLegend(){
+  [...legendEl.children].forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.code === activeCat);
+    chip.classList.toggle('dim', activeCat && chip.dataset.code !== activeCat);
+  });
+}
+
+// ---- Table grid ----
+const gridEl = document.getElementById('grid');
+function placeholder(r,c,label){
+  const d = document.createElement('div');
+  d.className = 'placeholder';
+  d.style.gridRow = r; d.style.gridColumn = c;
+  d.textContent = label;
+  return d;
+}
+function renderGrid(){
+  gridEl.innerHTML = '';
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  ELEMENTS.forEach(e => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.style.gridRow = e.r; cell.style.gridColumn = e.c;
+    cell.style.borderTop = `3px solid ${CATS[e.cat].color}`;
+    cell.tabIndex = 0;
+    cell.innerHTML = `<div class="num">${e.z}</div><div class="icon">${e.i}</div><div class="sym">${e.s}</div>`;
+    const matchesSearch = q && (e.n.toLowerCase().includes(q) || e.s.toLowerCase()===q || String(e.z)===q);
+    const matchesCat = !activeCat || e.cat === activeCat;
+    if (q && !matchesSearch) cell.classList.add('dim');
+    else if (!q && !matchesCat) cell.classList.add('dim');
+    if (matchesSearch) cell.classList.add('match');
+    cell.addEventListener('click', () => openSheet(e.z));
+    cell.addEventListener('keydown', ev => { if(ev.key==='Enter') openSheet(e.z); });
+    gridEl.appendChild(cell);
+  });
+  gridEl.appendChild(placeholder(6,3,'57–71'));
+  gridEl.appendChild(placeholder(7,3,'89–103'));
+}
+
+// ---- Detail sheet ----
+const sheetBackdrop = document.getElementById('sheetBackdrop');
+const sheetContent = document.getElementById('sheetContent');
+function openSheet(z){
+  const e = byZ[z];
+  sheetContent.innerHTML = `
+    <button class="sheet-close" id="sheetCloseBtn">✕</button>
+    <div class="browse-icon-badge" style="background:${CATS[e.cat].color}22">${e.i}</div>
+    <div class="browse-num">${e.z}</div>
+    <div class="browse-sym" style="color:${CATS[e.cat].color}">${e.s}</div>
+    <div class="browse-name">${e.n}</div>
+    <div class="browse-cat">${CATS[e.cat].label}</div>
+    <p class="browse-use">${e.u}</p>
+  `;
+  sheetBackdrop.classList.add('open');
+  document.getElementById('sheetCloseBtn').addEventListener('click', closeSheet);
+}
+function closeSheet(){ sheetBackdrop.classList.remove('open'); }
+sheetBackdrop.addEventListener('click', ev => { if(ev.target === sheetBackdrop) closeSheet(); });
+
+// ---- Browse (one by one) ----
+const browseCard = document.getElementById('browseCard');
+const progressSlider = document.getElementById('progressSlider');
+const progressLabel = document.getElementById('progressLabel');
+function renderBrowse(){
+  const e = order[browseIndex];
+  browseCard.innerHTML = `
+    <div class="browse-icon-badge" style="background:${CATS[e.cat].color}22">${e.i}</div>
+    <div class="browse-num">Element ${e.z}</div>
+    <div class="browse-sym" style="color:${CATS[e.cat].color}">${e.s}</div>
+    <div class="browse-name">${e.n}</div>
+    <div class="browse-cat">${CATS[e.cat].label}</div>
+    <p class="browse-use">${e.u}</p>
+  `;
+  progressSlider.value = browseIndex;
+  progressLabel.textContent = `${browseIndex+1} / ${order.length}`;
+  document.getElementById('prevBtn').disabled = browseIndex === 0;
+  document.getElementById('nextBtn').disabled = browseIndex === order.length-1;
+}
+document.getElementById('prevBtn').addEventListener('click', () => { if(browseIndex>0){browseIndex--; renderBrowse();} });
+document.getElementById('nextBtn').addEventListener('click', () => { if(browseIndex<order.length-1){browseIndex++; renderBrowse();} });
+progressSlider.addEventListener('input', () => { browseIndex = parseInt(progressSlider.value,10); renderBrowse(); });
+document.addEventListener('keydown', ev => {
+  if(document.getElementById('browseView').style.display === 'none') return;
+  if(ev.key === 'ArrowRight') document.getElementById('nextBtn').click();
+  if(ev.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+});
+
+// ---- Tabs ----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    document.getElementById('tableView').style.display = view==='table' ? 'block' : 'none';
+    document.getElementById('browseView').style.display = view==='browse' ? 'block' : 'none';
+    if(view==='browse') renderBrowse();
+  });
+});
+
+// ---- Search ----
+document.getElementById('search').addEventListener('input', () => {
+  renderGrid();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  if(q){
+    const found = ELEMENTS.find(e => e.n.toLowerCase().includes(q) || e.s.toLowerCase()===q || String(e.z)===q);
+    if(found){
+      const idx = order.findIndex(e=>e.z===found.z);
+      if(idx>=0){ browseIndex = idx; }
+    }
+  }
+});
+
+renderLegend();
+renderGrid();
+</script>
+</body>
+</html>

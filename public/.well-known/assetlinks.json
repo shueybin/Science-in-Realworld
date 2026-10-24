@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.scienceinrealworld.periodictable",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7D:0F:52:AB:FC:0E:D4:57:9D:69:B8:31:0C:8A:2A:42:0B:4A:A5:68:1A:18:23:44:03:97:F2:70:E2"
+      ]
+    }
+  }
+]
